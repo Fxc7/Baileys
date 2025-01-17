@@ -4,6 +4,7 @@ import { exec } from 'child_process'
 import * as Crypto from 'crypto'
 import { once } from 'events'
 import { createReadStream, createWriteStream, promises as fs, WriteStream } from 'fs'
+import fsExtra from 'fs-extra'
 import type { IAudioMetadata } from 'music-metadata'
 import { tmpdir } from 'os'
 import { join } from 'path'
@@ -310,8 +311,7 @@ export async function generateThumbnail(
 			await extractVideoThumb(file, imgFilename, '00:00:00', { width: 32, height: 32 })
 			const buff = await fs.readFile(imgFilename)
 			thumbnail = buff.toString('base64')
-
-			await fs.unlink(imgFilename)
+			fsExtra.remove(imgFilename)
 		} catch(err) {
 			options.logger?.debug('could not generate video thumb: ' + err)
 		}
@@ -427,7 +427,7 @@ export const encryptedStream = async(
 
 		if(didSaveToTmpPath) {
 			try {
-				await fs.unlink(bodyPath!)
+				fsExtra.remove(bodyPath!)
 			} catch(err) {
 				logger?.error({ err }, 'failed to save to tmp path')
 			}
